@@ -1,4 +1,4 @@
-package net.qnd.java.builders;
+package net.qnd.java.builders.command;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,14 +9,13 @@ class SetCommand implements Command {
 	private final Object value;
 	private final Class<?> propertyType;
 
-	public SetCommand(String propertyName, Object value,
-			Class<?> propertyType) {
+	public SetCommand(String propertyName, Object value, Class<?> propertyType) {
 		this.propertyName = propertyName;
 		this.value = value;
 		this.propertyType = propertyType;
 	}
 
-	public void execute(Object object) {
+	public <T> T execute(T object) {
 		Class<?> type = object.getClass();
 		Method method = null;
 		try {
@@ -31,7 +30,7 @@ class SetCommand implements Command {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-
+		return object;
 	}
 
 	private String getSetterName() {

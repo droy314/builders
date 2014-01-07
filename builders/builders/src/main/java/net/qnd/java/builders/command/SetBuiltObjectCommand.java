@@ -1,4 +1,7 @@
-package net.qnd.java.builders;
+package net.qnd.java.builders.command;
+
+import net.qnd.java.builders.Builder;
+import net.qnd.java.builders.spi.BuilderUtils;
 
 class SetBuiltObjectCommand implements Command {
 
@@ -11,10 +14,10 @@ class SetBuiltObjectCommand implements Command {
 		this.propertyName = propertyName;
 	}
 
-	public void execute(Object object) {
+	public <T> T execute(T object) {
 		Object built = builder.build();
-		new SetCommand(propertyName, built,
-				Builders.getBuiltProductType(builder.getClass()))
+		return (new SetCommand(propertyName, built,
+				BuilderUtils.getBuiltProductType(builder.getClass())))
 				.execute(object);
 	}
 

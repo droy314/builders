@@ -1,47 +1,18 @@
 package net.qnd.java.builders;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
+import net.qnd.java.builders.reflect.ReflectProxyBuilderFactory;
+import net.qnd.java.builders.spi.BuilderFactory;
+
 
 public class Builders {
 
 	public static <BuilderT> BuilderT newBuilder(Class<BuilderT> builderType) {
-		InvocationHandler handler = new DefaultBuilderHandler(builderType);
-		return (BuilderT) Proxy.newProxyInstance(Thread.currentThread()
-				.getContextClassLoader(), new Class<?>[] { builderType },
-				handler);
-
+		return newBuilder(new ReflectProxyBuilderFactory(), builderType);
 	}
 	
-	static Class<?> getBuiltProductType(Class<?> builderType) {
-		Type[] interfaces = builderType.getGenericInterfaces();
-		for (Type interfaceType : interfaces) {
-			if (interfaceType instanceof ParameterizedType) {
-				ParameterizedType parameterizedIntf = (ParameterizedType) interfaceType;
-				if (parameterizedIntf.getRawType().equals(Builder.class)) {
-					if (parameterizedIntf.getActualTypeArguments()[0] instanceof Class) {
-						return (Class<?>) parameterizedIntf
-								.getActualTypeArguments()[0];
-					}
-				}
-			} else if (interfaceType instanceof Class) {
-				return getBuiltProductType((Class<?>)  interfaceType);
-			}
-		}
-		return null;
+	public static <BuilderT> BuilderT newBuilder(BuilderFactory factory, Class<BuilderT> builderType) {
+		return factory.createBuilder(builderType);
 	}
-	
-	static <BuilderT> BuilderT newNestedBuilder(Class<BuilderT> builderType, Object parentBuilder) {
-		InvocationHandler handler = new DefaultBuilderHandler(builderType, parentBuilder);
-		return (BuilderT) Proxy.newProxyInstance(Thread.currentThread()
-				.getContextClassLoader(), new Class<?>[] { builderType, NestedBuilder.class },
-				handler);
 
-	}
 	
-	
-	
-
 }
